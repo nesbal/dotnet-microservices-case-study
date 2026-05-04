@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F5B0763D-B4F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "src\AuthService\AuthService.csproj", "{B3A9DD6C-D34F-467A-A5D0-F63ACF82DD36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductService", "src\ProductService\ProductService.csproj", "{2F454427-198B-458F-A0E5-BD05663E0740}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +22,13 @@ Global
 		{B3A9DD6C-D34F-467A-A5D0-F63ACF82DD36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3A9DD6C-D34F-467A-A5D0-F63ACF82DD36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3A9DD6C-D34F-467A-A5D0-F63ACF82DD36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F454427-198B-458F-A0E5-BD05663E0740}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F454427-198B-458F-A0E5-BD05663E0740}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F454427-198B-458F-A0E5-BD05663E0740}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F454427-198B-458F-A0E5-BD05663E0740}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B3A9DD6C-D34F-467A-A5D0-F63ACF82DD36} = {F5B0763D-B4F7-4595-B6E2-5978FD5BDE27}
+		{2F454427-198B-458F-A0E5-BD05663E0740} = {F5B0763D-B4F7-4595-B6E2-5978FD5BDE27}
 	EndGlobalSection
 EndGlobal
