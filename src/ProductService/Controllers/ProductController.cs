@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using ProductService.Data;
 using ProductService.Models;
 
 namespace ProductService.Controllers;
@@ -10,45 +11,45 @@ namespace ProductService.Controllers;
 public class ProductController : ControllerBase
 {
     private readonly HttpClient _httpClient;
+    private readonly AppDbContext _context;
 
-    public ProductController(HttpClient httpClient)
+    public ProductController(HttpClient httpClient, AppDbContext context)
     {
         _httpClient = httpClient;
+        _context = context;
     }
-
-    private static readonly List<Product> _products = new()
-    {
-        new Product { Id = 1, Name = "Keyboard", Price = 100 },
-        new Product { Id = 2, Name = "Mouse", Price = 50 }
-    };
 
     [HttpGet]
     public IActionResult GetAll()
     {
-        return Ok(_products);
+        var products = _context.Products.ToList();
+        return Ok(products);
     }
-    
+
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
-        var product = _products.FirstOrDefault(p => p.Id == id);
+        var product = _context.Products.Find(id);
 
         if (product == null)
             return NotFound();
 
         return Ok(product);
     }
-    
+
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Product product) {
-        product.Id = _products.Max(p => p.Id) + 1;
-        _products.Add(product);
+    public async Task<IActionResult> Create([FromBody] Product product)
+    {
+        _context.Products.Add(product);
+        await _context.SaveChangesAsync();
+
         var content = JsonSerializer.Serialize($"Product created: {product.Name}");
 
         await _httpClient.PostAsync(
             "http://localhost:5039/logs",
             new StringContent(content, Encoding.UTF8, "application/json")
         );
-        return CreatedAtAction(nameof(GetAll), new { id = product.Id }, product);
+
+        return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
     }
 }
