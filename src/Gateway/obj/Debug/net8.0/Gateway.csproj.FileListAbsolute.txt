@@ -34,3 +34,11 @@
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/obj/Debug/net8.0/Gateway.pdb
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/obj/Debug/net8.0/Gateway.genruntimeconfig.cache
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/obj/Debug/net8.0/ref/Gateway.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/bin/Debug/net8.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/bin/Debug/net8.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/bin/Debug/net8.0/Microsoft.IdentityModel.Logging.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
