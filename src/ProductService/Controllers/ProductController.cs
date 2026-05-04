@@ -18,4 +18,24 @@ public class ProductController : ControllerBase
     {
         return Ok(_products);
     }
+    
+    [HttpGet("{id}")]
+    public IActionResult GetById(int id)
+    {
+        var product = _products.FirstOrDefault(p => p.Id == id);
+
+        if (product == null)
+            return NotFound();
+
+        return Ok(product);
+    }
+    
+    [HttpPost]
+    public IActionResult Create([FromBody] Product product)
+    {
+        product.Id = _products.Max(p => p.Id) + 1;
+        _products.Add(product);
+
+        return CreatedAtAction(nameof(GetAll), new { id = product.Id }, product);
+    }
 }
