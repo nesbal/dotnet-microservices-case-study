@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "5lBurYzHGDw=",
+  "dgSpecHash": "9iRNIeoY6yU=",
   "success": true,
   "projectFilePath": "/Users/kitsune/Projects/dotnet-microservices-case-study/src/Gateway/Gateway.csproj",
   "expectedPackageFiles": [
@@ -10,7 +10,9 @@
     "/Users/kitsune/.nuget/packages/swashbuckle.aspnetcore/6.6.2/swashbuckle.aspnetcore.6.6.2.nupkg.sha512",
     "/Users/kitsune/.nuget/packages/swashbuckle.aspnetcore.swagger/6.6.2/swashbuckle.aspnetcore.swagger.6.6.2.nupkg.sha512",
     "/Users/kitsune/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.6.2/swashbuckle.aspnetcore.swaggergen.6.6.2.nupkg.sha512",
-    "/Users/kitsune/.nuget/packages/swashbuckle.aspnetcore.swaggerui/6.6.2/swashbuckle.aspnetcore.swaggerui.6.6.2.nupkg.sha512"
+    "/Users/kitsune/.nuget/packages/swashbuckle.aspnetcore.swaggerui/6.6.2/swashbuckle.aspnetcore.swaggerui.6.6.2.nupkg.sha512",
+    "/Users/kitsune/.nuget/packages/system.io.hashing/8.0.0/system.io.hashing.8.0.0.nupkg.sha512",
+    "/Users/kitsune/.nuget/packages/yarp.reverseproxy/2.3.0/yarp.reverseproxy.2.3.0.nupkg.sha512"
   ],
   "logs": []
 }
