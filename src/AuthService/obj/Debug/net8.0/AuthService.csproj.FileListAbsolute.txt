@@ -32,3 +32,8 @@
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/obj/Debug/net8.0/AuthService.pdb
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/obj/Debug/net8.0/AuthService.genruntimeconfig.cache
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/obj/Debug/net8.0/ref/AuthService.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/Microsoft.IdentityModel.Logging.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
