@@ -1,5 +1,8 @@
 using ProductService.Data;
 using Microsoft.EntityFrameworkCore;
+using ProductService.Application.Interfaces;
+using ProductService.Infrastructure.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,6 +15,7 @@ var dbPath = Path.Combine(AppContext.BaseDirectory, "products.db");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 
