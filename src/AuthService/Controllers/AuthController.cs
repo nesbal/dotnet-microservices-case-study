@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Text;
 using AuthService.Data;
 using AuthService.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Controllers;
 
@@ -14,11 +16,15 @@ public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _config;
-
-    public AuthController(IConfiguration config, AppDbContext context)
+    private readonly UserManager<User> _userManager;
+    public AuthController(
+        IConfiguration config,
+        AppDbContext context,
+        UserManager<User> userManager)
     {
         _config = config;
         _context = context;
+        _userManager = userManager;
     }
 
     private string GenerateRefreshToken()
@@ -57,24 +63,29 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = _context.Users
-            .FirstOrDefault(x => x.Username == request.Username);
+        if (string.IsNullOrWhiteSpace(request.Username) ||
+            string.IsNullOrWhiteSpace(request.Password))
+        {
+            return BadRequest();
+        }
+
+        var user = await _userManager.FindByNameAsync(request.Username);
 
         if (user == null)
             return Unauthorized();
 
-        var isValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+        var isValid = await _userManager.CheckPasswordAsync(user, request.Password);
 
         if (!isValid)
             return Unauthorized();
 
-        var accessToken = GenerateJwtToken(user.Username);
+        var accessToken = GenerateJwtToken(user.UserName!);
         var refreshToken = GenerateRefreshToken();
 
         _context.RefreshTokens.Add(new RefreshToken
         {
             Token = refreshToken,
-            Username = user.Username,
+            Username = user.UserName!,
             ExpiresAt = DateTime.UtcNow.AddDays(7)
         });
 
@@ -86,12 +97,46 @@ public class AuthController : ControllerBase
             refreshToken
         });
     }
+    
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] LoginRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Username) ||
+            string.IsNullOrWhiteSpace(request.Password))
+        {
+            return BadRequest();
+        }
+
+        var existingUser = await _userManager.FindByNameAsync(request.Username);
+
+        if (existingUser != null)
+        {
+            return Conflict("User already exists");
+        }
+
+        var user = new User
+        {
+            UserName = request.Username
+        };
+
+        var result = await _userManager.CreateAsync(user, request.Password);
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        return Ok();
+    }
 
     [HttpPost("refresh")]
-    public IActionResult Refresh([FromBody] string refreshToken)
+    public async Task<IActionResult> Refresh([FromBody] string refreshToken)
     {
-        var tokenInDb = _context.RefreshTokens
-            .FirstOrDefault(x => x.Token == refreshToken);
+        if (string.IsNullOrWhiteSpace(refreshToken))
+            return BadRequest();
+
+        var tokenInDb = await _context.RefreshTokens
+            .FirstOrDefaultAsync(x => x.Token == refreshToken);
 
         if (tokenInDb == null)
             return Unauthorized();
@@ -101,9 +146,23 @@ public class AuthController : ControllerBase
 
         var newAccessToken = GenerateJwtToken(tokenInDb.Username);
 
+        _context.RefreshTokens.Remove(tokenInDb);
+
+        var newRefreshToken = GenerateRefreshToken();
+
+        _context.RefreshTokens.Add(new RefreshToken
+        {
+            Token = newRefreshToken,
+            Username = tokenInDb.Username,
+            ExpiresAt = DateTime.UtcNow.AddDays(7)
+        });
+
+        await _context.SaveChangesAsync();
+
         return Ok(new
         {
-            accessToken = newAccessToken
+            accessToken = newAccessToken,
+            refreshToken = newRefreshToken
         });
     }
 }

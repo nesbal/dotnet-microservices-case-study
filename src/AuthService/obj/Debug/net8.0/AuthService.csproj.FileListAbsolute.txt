@@ -133,3 +133,7 @@
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/runtimes/win-x64/native/e_sqlite3.dll
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/runtimes/win-x86/native/e_sqlite3.dll
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/BCrypt.Net-Next.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
