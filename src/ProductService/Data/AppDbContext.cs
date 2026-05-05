@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ProductService.Models;
-
+using ProductService.Domain;
 namespace ProductService.Data;
 
 public class AppDbContext : DbContext

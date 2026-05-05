@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using ProductService.Data;
-using ProductService.Models;
+using ProductService.Domain;
 
 namespace ProductService.Controllers;
 
