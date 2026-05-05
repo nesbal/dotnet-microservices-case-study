@@ -4,18 +4,22 @@ using ProductService.Application.Commands;
 using ProductService.Application.Interfaces;
 using ProductService.Domain;
 using ProductService.Application.Events;
+using Microsoft.Extensions.Caching.Distributed;
 
 public class UpdateProductHandler
 {
     private readonly IProductRepository _repository;
     private readonly IEventPublisher _eventPublisher;
+    private readonly IDistributedCache _cache;
 
     public UpdateProductHandler(
         IProductRepository repository,
-        IEventPublisher eventPublisher)
+        IEventPublisher eventPublisher,
+        IDistributedCache cache)
     {
         _repository = repository;
         _eventPublisher = eventPublisher;
+        _cache = cache;
     }
 
     public async Task<bool> Handle(UpdateProductCommand command)
@@ -31,6 +35,8 @@ public class UpdateProductHandler
         await _repository.UpdateAsync(product);
 
         await _eventPublisher.PublishAsync($"Product updated: {product.Name}");
+
+        await _cache.RemoveAsync("products_all");
 
         return true;
     }
