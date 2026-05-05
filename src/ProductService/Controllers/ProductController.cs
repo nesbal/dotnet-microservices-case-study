@@ -8,6 +8,7 @@ using ProductService.Application.Commands;
 using Microsoft.AspNetCore.Authorization;
 using ProductService.Application.Commands;
 using ProductService.Application.Handlers;
+using ProductService.Application.Events;
 
 namespace ProductService.Controllers;
 
@@ -15,18 +16,18 @@ namespace ProductService.Controllers;
 [Route("")]
 public class ProductController : ControllerBase
 {
-    private readonly HttpClient _httpClient;
+    private readonly IEventPublisher _eventPublisher;
     private readonly IProductRepository _repository;
     private readonly CreateProductHandler _createHandler;
     private readonly UpdateProductHandler _updateHandler;
 
     public ProductController(
-        HttpClient httpClient,
+        IEventPublisher eventPublisher,
         IProductRepository repository,
         CreateProductHandler createHandler,
         UpdateProductHandler updateHandler)
     {
-        _httpClient = httpClient;
+        _eventPublisher = eventPublisher;
         _repository = repository;
         _createHandler = createHandler;
         _updateHandler = updateHandler;
@@ -55,12 +56,7 @@ public class ProductController : ControllerBase
     {
         var product = await _createHandler.Handle(command);
 
-        var content = JsonSerializer.Serialize($"Product created: {product.Name}");
-
-        await _httpClient.PostAsync(
-            "http://localhost:5039/logs",
-            new StringContent(content, Encoding.UTF8, "application/json")
-        );
+        await _eventPublisher.PublishAsync($"Product created: {product.Name}");
 
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
     }
