@@ -5,6 +5,9 @@ using ProductService.Domain;
 using ProductService.Application.Interfaces;
 using ProductService.Application.Handlers;
 using ProductService.Application.Commands;
+using Microsoft.AspNetCore.Authorization;
+using ProductService.Application.Commands;
+using ProductService.Application.Handlers;
 
 namespace ProductService.Controllers;
 
@@ -15,12 +18,18 @@ public class ProductController : ControllerBase
     private readonly HttpClient _httpClient;
     private readonly IProductRepository _repository;
     private readonly CreateProductHandler _createHandler;
+    private readonly UpdateProductHandler _updateHandler;
 
-    public ProductController(HttpClient httpClient, CreateProductHandler createHandler, IProductRepository repository)
+    public ProductController(
+        HttpClient httpClient,
+        IProductRepository repository,
+        CreateProductHandler createHandler,
+        UpdateProductHandler updateHandler)
     {
         _httpClient = httpClient;
         _repository = repository;
         _createHandler = createHandler;
+        _updateHandler = updateHandler;
     }
 
     [HttpGet]
@@ -54,5 +63,20 @@ public class ProductController : ControllerBase
         );
 
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+    }
+    
+    [Authorize]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCommand command)
+    {
+        if (id != command.Id)
+            return BadRequest();
+
+        var success = await _updateHandler.Handle(command);
+
+        if (!success)
+            return NotFound();
+
+        return NoContent();
     }
 }

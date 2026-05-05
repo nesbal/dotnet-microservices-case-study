@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using ProductService.Application.Handlers;
 using ProductService.Application.Interfaces;
 using ProductService.Infrastructure.Repositories;
+using ProductService.Application.Events;
+using ProductService.Infrastructure.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +18,12 @@ var dbPath = Path.Combine(AppContext.BaseDirectory, "products.db");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<CreateProductHandler>();
 builder.Services.AddScoped<UpdateProductHandler>();
+builder.Services.AddScoped<IEventPublisher, HttpEventPublisher>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
