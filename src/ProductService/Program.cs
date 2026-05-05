@@ -1,5 +1,6 @@
 using ProductService.Data;
 using Microsoft.EntityFrameworkCore;
+using ProductService.Application.Handlers;
 using ProductService.Application.Interfaces;
 using ProductService.Infrastructure.Repositories;
 
@@ -16,7 +17,7 @@ var dbPath = Path.Combine(AppContext.BaseDirectory, "products.db");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-
+builder.Services.AddScoped<CreateProductHandler>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
