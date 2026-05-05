@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using ProductService.Data;
 using ProductService.Domain;
+using ProductService.Application.Interfaces;
 
 namespace ProductService.Controllers;
 
@@ -11,25 +11,25 @@ namespace ProductService.Controllers;
 public class ProductController : ControllerBase
 {
     private readonly HttpClient _httpClient;
-    private readonly AppDbContext _context;
+    private readonly IProductRepository _repository;
 
-    public ProductController(HttpClient httpClient, AppDbContext context)
+    public ProductController(HttpClient httpClient, IProductRepository repository)
     {
         _httpClient = httpClient;
-        _context = context;
+        _repository = repository;
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var products = _context.Products.ToList();
+        var products = await _repository.GetAllAsync();
         return Ok(products);
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var product = _context.Products.Find(id);
+        var product = await _repository.GetByIdAsync(id);
 
         if (product == null)
             return NotFound();
@@ -40,8 +40,7 @@ public class ProductController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Product product)
     {
-        _context.Products.Add(product);
-        await _context.SaveChangesAsync();
+        await _repository.AddAsync(product);
 
         var content = JsonSerializer.Serialize($"Product created: {product.Name}");
 
