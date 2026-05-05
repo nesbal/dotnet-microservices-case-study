@@ -23,6 +23,8 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<CreateProductHandler>();
 builder.Services.AddScoped<UpdateProductHandler>();
 builder.Services.AddScoped<IEventPublisher, HttpEventPublisher>();
+builder.Services.AddScoped<GetAllProductsHandler>();
+builder.Services.AddScoped<GetProductByIdHandler>();
 
 var app = builder.Build();
 

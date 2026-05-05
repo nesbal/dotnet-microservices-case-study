@@ -1,14 +1,9 @@
-using System.Text;
-using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using ProductService.Domain;
-using ProductService.Application.Interfaces;
 using ProductService.Application.Handlers;
 using ProductService.Application.Commands;
 using Microsoft.AspNetCore.Authorization;
-using ProductService.Application.Commands;
-using ProductService.Application.Handlers;
 using ProductService.Application.Events;
+using ProductService.Application.Queries;
 
 namespace ProductService.Controllers;
 
@@ -16,34 +11,34 @@ namespace ProductService.Controllers;
 [Route("")]
 public class ProductController : ControllerBase
 {
-    private readonly IEventPublisher _eventPublisher;
-    private readonly IProductRepository _repository;
     private readonly CreateProductHandler _createHandler;
     private readonly UpdateProductHandler _updateHandler;
+    private readonly GetAllProductsHandler _getAllHandler;
+    private readonly GetProductByIdHandler _getByIdHandler;
 
     public ProductController(
-        IEventPublisher eventPublisher,
-        IProductRepository repository,
         CreateProductHandler createHandler,
-        UpdateProductHandler updateHandler)
+        UpdateProductHandler updateHandler,
+        GetAllProductsHandler getAllHandler,
+        GetProductByIdHandler getByIdHandler)
     {
-        _eventPublisher = eventPublisher;
-        _repository = repository;
         _createHandler = createHandler;
         _updateHandler = updateHandler;
+        _getAllHandler = getAllHandler;
+        _getByIdHandler = getByIdHandler;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var products = await _repository.GetAllAsync();
+        var products = await _getAllHandler.Handle();
         return Ok(products);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var product = await _repository.GetByIdAsync(id);
+        var product = await _getByIdHandler.Handle(new GetProductByIdQuery { Id = id });
 
         if (product == null)
             return NotFound();
