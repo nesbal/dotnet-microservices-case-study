@@ -3,6 +3,8 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using ProductService.Domain;
 using ProductService.Application.Interfaces;
+using ProductService.Application.Handlers;
+using ProductService.Application.Commands;
 
 namespace ProductService.Controllers;
 
@@ -12,11 +14,12 @@ public class ProductController : ControllerBase
 {
     private readonly HttpClient _httpClient;
     private readonly IProductRepository _repository;
+    private readonly CreateProductHandler _createHandler;
 
-    public ProductController(HttpClient httpClient, IProductRepository repository)
+    public ProductController(HttpClient httpClient, CreateProductHandler createHandler)
     {
         _httpClient = httpClient;
-        _repository = repository;
+        _createHandler = createHandler;
     }
 
     [HttpGet]
@@ -38,9 +41,9 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Product product)
+    public async Task<IActionResult> Create([FromBody] CreateProductCommand command)
     {
-        await _repository.AddAsync(product);
+        var product = await _createHandler.Handle(command);
 
         var content = JsonSerializer.Serialize($"Product created: {product.Name}");
 
