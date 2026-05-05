@@ -16,9 +16,10 @@ public class ProductController : ControllerBase
     private readonly IProductRepository _repository;
     private readonly CreateProductHandler _createHandler;
 
-    public ProductController(HttpClient httpClient, CreateProductHandler createHandler)
+    public ProductController(HttpClient httpClient, CreateProductHandler createHandler, IProductRepository repository)
     {
         _httpClient = httpClient;
+        _repository = repository;
         _createHandler = createHandler;
     }
 
