@@ -127,3 +127,12 @@
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/runtimes/win-arm64/native/e_sqlite3.dll
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/runtimes/win-x64/native/e_sqlite3.dll
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/runtimes/win-x86/native/e_sqlite3.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.Extensions.Caching.Abstractions.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.Extensions.Caching.StackExchangeRedis.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.Extensions.Options.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.Extensions.Primitives.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Pipelines.Sockets.Unofficial.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/StackExchange.Redis.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/System.Diagnostics.DiagnosticSource.dll

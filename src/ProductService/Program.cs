@@ -5,6 +5,7 @@ using ProductService.Application.Interfaces;
 using ProductService.Infrastructure.Repositories;
 using ProductService.Application.Events;
 using ProductService.Infrastructure.Events;
+using Microsoft.Extensions.Caching.Distributed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,10 @@ builder.Services.AddScoped<UpdateProductHandler>();
 builder.Services.AddScoped<IEventPublisher, HttpEventPublisher>();
 builder.Services.AddScoped<GetAllProductsHandler>();
 builder.Services.AddScoped<GetProductByIdHandler>();
-
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["Redis:ConnectionString"];
+});
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
