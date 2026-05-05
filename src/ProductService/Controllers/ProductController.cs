@@ -56,8 +56,6 @@ public class ProductController : ControllerBase
     {
         var product = await _createHandler.Handle(command);
 
-        await _eventPublisher.PublishAsync($"Product created: {product.Name}");
-
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
     }
     
