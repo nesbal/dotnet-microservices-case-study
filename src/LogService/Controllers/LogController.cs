@@ -9,10 +9,12 @@ namespace LogService.Controllers;
 public class LogController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly ILogger<LogController> _logger;
 
-    public LogController(AppDbContext context)
+    public LogController(AppDbContext context, ILogger<LogController> logger)
     {
         _context = context;
+        _logger = logger;
     }
     
     [HttpPost]
@@ -26,7 +28,15 @@ public class LogController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        Console.WriteLine($"LOG: {message}");
+        if (!string.IsNullOrEmpty(message) &&
+            message.Contains("error", StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogError("Error event: {Message}", message);
+        }
+        else
+        {
+            _logger.LogInformation("Product event received: {Message}", message);
+        }
 
         return Ok();
     }
