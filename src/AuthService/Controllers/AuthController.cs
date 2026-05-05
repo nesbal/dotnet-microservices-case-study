@@ -26,8 +26,7 @@ public class AuthController : ControllerBase
         return Convert.ToBase64String(Guid.NewGuid().ToByteArray());
     }
 
-    private string GenerateJwtToken()
-    {
+    private string GenerateJwtToken(string username)    {
         var key = _config["Jwt:Key"]
                   ?? throw new Exception("Jwt:Key is missing");
 
@@ -39,7 +38,7 @@ public class AuthController : ControllerBase
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, "nesibe"),
+            new Claim(ClaimTypes.Name, username),            
             new Claim(ClaimTypes.Role, "admin"),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
@@ -56,15 +55,26 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login()
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var accessToken = GenerateJwtToken();
+        var user = _context.Users
+            .FirstOrDefault(x => x.Username == request.Username);
+
+        if (user == null)
+            return Unauthorized();
+
+        var isValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+
+        if (!isValid)
+            return Unauthorized();
+
+        var accessToken = GenerateJwtToken(user.Username);
         var refreshToken = GenerateRefreshToken();
 
         _context.RefreshTokens.Add(new RefreshToken
         {
             Token = refreshToken,
-            Username = "nesibe",
+            Username = user.Username,
             ExpiresAt = DateTime.UtcNow.AddDays(7)
         });
 
@@ -89,7 +99,7 @@ public class AuthController : ControllerBase
         if (tokenInDb.ExpiresAt < DateTime.UtcNow)
             return Unauthorized();
 
-        var newAccessToken = GenerateJwtToken();
+        var newAccessToken = GenerateJwtToken(tokenInDb.Username);
 
         return Ok(new
         {

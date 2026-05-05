@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "Ei7km1znJ84=",
+  "dgSpecHash": "Pa3DTnHK22w=",
   "success": true,
   "projectFilePath": "/Users/kitsune/Projects/dotnet-microservices-case-study/src/AuthService/AuthService.csproj",
   "expectedPackageFiles": [
+    "/Users/kitsune/.nuget/packages/bcrypt.net-next/4.1.0/bcrypt.net-next.4.1.0.nupkg.sha512",
     "/Users/kitsune/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/kitsune/.nuget/packages/microsoft.aspnetcore.openapi/8.0.26/microsoft.aspnetcore.openapi.8.0.26.nupkg.sha512",
     "/Users/kitsune/.nuget/packages/microsoft.bcl.asyncinterfaces/6.0.0/microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
