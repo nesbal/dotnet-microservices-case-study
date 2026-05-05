@@ -18,6 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<CreateProductHandler>();
+builder.Services.AddScoped<UpdateProductHandler>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
