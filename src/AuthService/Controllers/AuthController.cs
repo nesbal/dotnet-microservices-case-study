@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using AuthService.Data;
 using AuthService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +31,12 @@ public class AuthController : ControllerBase
 
     private string GenerateRefreshToken()
     {
-        return Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+        var randomBytes = new byte[64];
+
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomBytes);
+
+        return Convert.ToBase64String(randomBytes);
     }
 
     private string GenerateJwtToken(string username)    {
@@ -58,6 +65,13 @@ public class AuthController : ControllerBase
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+    
+    private string HashToken(string token)
+    {
+        using var sha256 = SHA256.Create();
+        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(token));
+        return Convert.ToBase64String(bytes);
     }
 
     [HttpPost("login")]
@@ -135,8 +149,10 @@ public class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(refreshToken))
             return BadRequest();
 
-        var tokenInDb = await _context.RefreshTokens
-            .FirstOrDefaultAsync(x => x.Token == refreshToken);
+        var hashed = HashToken(refreshToken);
+
+        var tokenInDb = _context.RefreshTokens
+            .FirstOrDefault(x => x.Token == hashed);
 
         if (tokenInDb == null)
             return Unauthorized();
@@ -152,7 +168,7 @@ public class AuthController : ControllerBase
 
         _context.RefreshTokens.Add(new RefreshToken
         {
-            Token = newRefreshToken,
+            Token = HashToken(newRefreshToken),
             Username = tokenInDb.Username,
             ExpiresAt = DateTime.UtcNow.AddDays(7)
         });
@@ -164,5 +180,12 @@ public class AuthController : ControllerBase
             accessToken = newAccessToken,
             refreshToken = newRefreshToken
         });
+    }
+    
+    [Authorize]
+    [HttpGet("me")]
+    public IActionResult Me()
+    {
+        return Ok(User.Identity?.Name);
     }
 }
