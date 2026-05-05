@@ -1,0 +1,36 @@
+# Build
+bin/
+obj/
+
+# User-specific
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / IntelliJ
+.idea/
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# SQLite / local db
+*.db
+
+# Docker
+docker-compose.override.yml
+
+# NuGet
+*.nupkg
+
+# Test results
+TestResults/
