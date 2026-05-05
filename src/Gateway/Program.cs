@@ -19,31 +19,30 @@ builder.Services.AddRateLimiter(options =>
         opt.Window = TimeSpan.FromSeconds(10);
     });
 });
+var jwtKey = builder.Configuration["Jwt:Key"]
+             ?? throw new Exception("Jwt:Key missing");
+var issuer = builder.Configuration["Jwt:Issuer"];
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var key = "THIS_IS_A_SUPER_LONG_SECRET_KEY_1234567890";
-
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
 
-            ValidIssuer = "auth-service",
-            ValidAudience = "auth-service",
+            ValidIssuer = issuer,
 
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(key)
-            )
+                Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -54,7 +53,8 @@ app.UseHttpsRedirection();
 
 app.UseRateLimiter();
 
-app.MapReverseProxy().RequireRateLimiting("fixed");
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapReverseProxy().RequireRateLimiting("fixed");
+
 app.Run();
