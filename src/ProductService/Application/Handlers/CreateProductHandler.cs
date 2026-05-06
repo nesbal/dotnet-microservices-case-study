@@ -22,12 +22,13 @@ public class CreateProductHandler
         _cache = cache;
     }
 
-    public async Task<Product> Handle(CreateProductCommand command)
+    public async Task<Product> Handle(CreateProductCommand command, string username)
     {
         var product = new Product
         {
             Name = command.Name,
-            Price = command.Price
+            Price = command.Price,
+            OwnerUsername = username
         };
 
         await _repository.AddAsync(product);

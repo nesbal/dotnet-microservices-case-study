@@ -151,6 +151,28 @@ public class AuthController : ControllerBase
 
         return Ok();
     }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost("users/{username}/promote")]
+    public async Task<IActionResult> PromoteToAdmin(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+
+        if (user == null)
+            return NotFound("User not found");
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        if (roles.Contains("Admin"))
+            return BadRequest("User is already an admin");
+
+        var result = await _userManager.AddToRoleAsync(user, "Admin");
+
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
+
+        return Ok($"{username} is now an Admin");
+    }
 
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] string refreshToken)

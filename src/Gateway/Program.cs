@@ -16,14 +16,9 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-var jwtKey = builder.Configuration["JWT_KEY"] 
-             ?? throw new Exception("JWT_KEY is missing");
-
-var issuer = builder.Configuration["JWT_ISSUER"] 
-             ?? throw new Exception("JWT_ISSUER is missing");
-
-var audience = builder.Configuration["JWT_AUDIENCE"] 
-               ?? throw new Exception("JWT_AUDIENCE is missing");
+var jwtKey = builder.Configuration["JWT_KEY"];
+var issuer = builder.Configuration["JWT_ISSUER"];
+var audience = builder.Configuration["JWT_AUDIENCE"];
 builder.Services
     .AddAuthentication(options =>
     {

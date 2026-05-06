@@ -45,16 +45,15 @@ public class ProductController : ControllerBase
         return Ok(product);
     }
 
-    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateProductCommand command)
     {
-        var product = await _createHandler.Handle(command);
-
+        var username = User.Identity?.Name!;
+        var product = await _createHandler.Handle(command, username);
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
     }
     
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminOrOwner")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCommand command)
     {

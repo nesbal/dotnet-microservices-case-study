@@ -16,14 +16,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
-var jwtKey = builder.Configuration["JWT_KEY"] 
-             ?? throw new Exception("JWT_KEY is missing");
-
-var issuer = builder.Configuration["JWT_ISSUER"] 
-             ?? throw new Exception("JWT_ISSUER is missing");
-
-var audience = builder.Configuration["JWT_AUDIENCE"] 
-               ?? throw new Exception("JWT_AUDIENCE is missing");
+var jwtKey = builder.Configuration["JWT_KEY"];
+var issuer = builder.Configuration["JWT_ISSUER"];
+var audience = builder.Configuration["JWT_AUDIENCE"];
 builder.Services
     .AddAuthentication(options =>
     {
@@ -50,7 +45,28 @@ builder.Services
             IssuerSigningKey = key
         };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOrOwner", policy =>
+        policy.RequireAssertion(context =>
+        {
+            var user = context.User;
+
+            if (user.IsInRole("Admin"))
+                return true;
+
+            var httpContext = context.Resource as HttpContext;
+            var routeId = httpContext?.Request.RouteValues["id"]?.ToString();
+
+            if (routeId == null)
+                return false;
+
+            var db = httpContext.RequestServices.GetRequiredService<AppDbContext>();
+            var product = db.Products.Find(int.Parse(routeId));
+
+            return product?.OwnerUsername == user.Identity?.Name;
+        }));
+});
 var dbPath = Path.Combine(AppContext.BaseDirectory, "products.db");
 
 builder.Services.AddDbContext<AppDbContext>(options =>

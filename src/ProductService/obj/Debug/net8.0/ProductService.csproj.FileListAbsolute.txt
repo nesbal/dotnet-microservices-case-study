@@ -136,3 +136,11 @@
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Pipelines.Sockets.Unofficial.dll
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/StackExchange.Redis.dll
 /Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/System.Diagnostics.DiagnosticSource.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.IdentityModel.Logging.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
+/Users/kitsune/Projects/dotnet-microservices-case-study/src/ProductService/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
