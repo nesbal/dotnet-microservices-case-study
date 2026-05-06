@@ -18,7 +18,7 @@ public class HttpEventPublisher : IEventPublisher
         var content = JsonSerializer.Serialize(message);
 
         await _httpClient.PostAsync(
-            "http://localhost:5039/logs",
+            "http://logservice/logs",
             new StringContent(content, Encoding.UTF8, "application/json")
         );
     }

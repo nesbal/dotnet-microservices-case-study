@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+
+  gateway:
+    build: ./src/Gateway
+    ports:
+      - "5296:80"
+    depends_on:
+      - authservice
+      - productservice
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+
+  authservice:
+    build: ./src/AuthService
+    ports:
+      - "5264:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+
+  productservice:
+    build: ./src/ProductService
+    ports:
+      - "5265:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+
+  logservice:
+    build: ./src/LogService
+    ports:
+      - "5039:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
