@@ -1,59 +1,69 @@
-version: '3.8'
-
 services:
-
   gateway:
     build: ./src/Gateway
+    container_name: gateway
     ports:
-      - "5296:80"
+      - "5296:80"    
     depends_on:
       - authservice
       - productservice
+      - logservice
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - AuthService__BaseUrl=http://authservice
+      - ProductService__BaseUrl=http://productservice
+      - LogService__BaseUrl=http://logservice
 
   authservice:
     build: ./src/AuthService
+    container_name: authservice
     ports:
       - "5264:80"
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - JWT_KEY=${JWT_KEY}
       - JWT_ISSUER=${JWT_ISSUER}
       - JWT_AUDIENCE=${JWT_AUDIENCE}
     volumes:
-      - auth_data:/app/data
+      - ./data/auth:/app/data
 
   productservice:
     build: ./src/ProductService
+    container_name: productservice
     ports:
       - "5265:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
     depends_on:
       - redis
-      - logservice
+    volumes:
+      - ./data/product:/app/data
+
+  logservice:
+    build: ./src/LogService
+    container_name: logservice
+    ports:
+      - "5266:80"
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - JWT_KEY=${JWT_KEY}
       - JWT_ISSUER=${JWT_ISSUER}
       - JWT_AUDIENCE=${JWT_AUDIENCE}
     volumes:
-      - product_data:/app/data
-
-  logservice:
-    build: ./src/LogService
-    ports:
-      - "5039:80"
-    environment:
-      - ASPNETCORE_URLS=http://+:80
-    volumes:
-      - log_data:/app/data
+      - ./data/log:/app/data
 
   redis:
     image: redis:7
+    container_name: redis
     ports:
       - "6379:6379"
-
-volumes:
-  auth_data:
-  log_data:
-  product_data:

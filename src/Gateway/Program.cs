@@ -1,12 +1,8 @@
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddReverseProxy()
@@ -28,9 +24,17 @@ var issuer = builder.Configuration["JWT_ISSUER"]
 
 var audience = builder.Configuration["JWT_AUDIENCE"] 
                ?? throw new Exception("JWT_AUDIENCE is missing");
-builder.Services.AddAuthentication("Bearer")
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = "Bearer";
+        options.DefaultChallengeScheme = "Bearer";
+    })
     .AddJwtBearer("Bearer", options =>
     {
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtKey));
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -40,10 +44,10 @@ builder.Services.AddAuthentication("Bearer")
             ValidAudience = audience,
 
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
 
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtKey))
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = key
         };
     });
 

@@ -1,11 +1,12 @@
+using System.Text;
 using ProductService.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProductService.Application.Handlers;
 using ProductService.Application.Interfaces;
 using ProductService.Infrastructure.Repositories;
 using ProductService.Application.Events;
 using ProductService.Infrastructure.Events;
-using Microsoft.Extensions.Caching.Distributed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,41 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
+var jwtKey = builder.Configuration["JWT_KEY"] 
+             ?? throw new Exception("JWT_KEY is missing");
+
+var issuer = builder.Configuration["JWT_ISSUER"] 
+             ?? throw new Exception("JWT_ISSUER is missing");
+
+var audience = builder.Configuration["JWT_AUDIENCE"] 
+               ?? throw new Exception("JWT_AUDIENCE is missing");
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = "Bearer";
+        options.DefaultChallengeScheme = "Bearer";
+    })
+    .AddJwtBearer("Bearer", options =>
+    {
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtKey));
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = issuer,
+
+            ValidateAudience = true,
+            ValidAudience = audience,
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = key
+        };
+    });
+builder.Services.AddAuthorization();
 var dbPath = Path.Combine(AppContext.BaseDirectory, "products.db");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -46,7 +82,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
 

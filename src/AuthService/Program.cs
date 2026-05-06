@@ -27,9 +27,17 @@ var issuer = builder.Configuration["JWT_ISSUER"]
 
 var audience = builder.Configuration["JWT_AUDIENCE"] 
                ?? throw new Exception("JWT_AUDIENCE is missing");
-builder.Services.AddAuthentication("Bearer")
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = "Bearer";
+        options.DefaultChallengeScheme = "Bearer";
+    })
     .AddJwtBearer("Bearer", options =>
     {
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtKey));
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -39,10 +47,10 @@ builder.Services.AddAuthentication("Bearer")
             ValidAudience = audience,
 
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
 
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtKey))
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = key
         };
     });
 

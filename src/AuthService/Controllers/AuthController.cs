@@ -40,11 +40,12 @@ public class AuthController : ControllerBase
     }
 
     private string GenerateJwtToken(string username)    {
-        var key = _config["Jwt:Key"]
-                  ?? throw new Exception("Jwt:Key is missing");
-
-        var issuer = _config["Jwt:Issuer"]
-                     ?? throw new Exception("Jwt:Issuer is missing");
+        var key = _config["JWT_KEY"]
+                  ?? throw new Exception("JWT_KEY is missing");
+        var audience = _config["JWT_AUDIENCE"]
+                       ?? throw new Exception("JWT_AUDIENCE is missing");
+        var issuer = _config["JWT_ISSUER"]
+                     ?? throw new Exception("JWT_ISSUER is missing");
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -58,7 +59,7 @@ public class AuthController : ControllerBase
 
         var token = new JwtSecurityToken(
             issuer: issuer,
-            audience: issuer,
+            audience: audience,
             claims: claims,
             expires: DateTime.Now.AddHours(1),
             signingCredentials: credentials

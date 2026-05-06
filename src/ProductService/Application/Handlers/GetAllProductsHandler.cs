@@ -29,10 +29,8 @@ public class GetAllProductsHandler
             return JsonSerializer.Deserialize<List<Product>>(cachedData)!;
         }
 
-// cache yok → DB'den çek
         var products = await _repository.GetAllAsync();
 
-// cache'e yaz
         var options = new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)

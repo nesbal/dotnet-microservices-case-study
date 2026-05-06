@@ -54,7 +54,7 @@ public class ProductController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
     }
     
-    [Authorize]
+    [Authorize(Roles = "admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCommand command)
     {
