@@ -8,12 +8,11 @@ services:
       - authservice
       - productservice
       - logservice
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - JWT_KEY=${JWT_KEY}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - JWT_AUDIENCE=${JWT_AUDIENCE}
       - AuthService__BaseUrl=http://authservice
       - ProductService__BaseUrl=http://productservice
       - LogService__BaseUrl=http://logservice
@@ -23,12 +22,11 @@ services:
     container_name: authservice
     ports:
       - "5264:80"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - JWT_KEY=${JWT_KEY}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - JWT_AUDIENCE=${JWT_AUDIENCE}
     volumes:
       - ./data/auth:/app/data
 
@@ -37,12 +35,11 @@ services:
     container_name: productservice
     ports:
       - "5265:80"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - JWT_KEY=${JWT_KEY}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - JWT_AUDIENCE=${JWT_AUDIENCE}
     depends_on:
       - redis
     volumes:
@@ -53,12 +50,11 @@ services:
     container_name: logservice
     ports:
       - "5266:80"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - JWT_KEY=${JWT_KEY}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - JWT_AUDIENCE=${JWT_AUDIENCE}
     volumes:
       - ./data/log:/app/data
 

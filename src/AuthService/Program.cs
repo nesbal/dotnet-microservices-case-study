@@ -64,6 +64,35 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+    if (!await roleManager.RoleExistsAsync("Admin"))
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+
+    if (!await roleManager.RoleExistsAsync("User"))
+        await roleManager.CreateAsync(new IdentityRole("User"));
+
+    var adminUsername = config["ADMIN_USERNAME"];
+    var adminPassword = config["ADMIN_PASSWORD"];
+
+    if (!string.IsNullOrEmpty(adminUsername) && !string.IsNullOrEmpty(adminPassword))
+    {
+        var adminUser = await userManager.FindByNameAsync(adminUsername);
+
+        if (adminUser == null)
+        {
+            var user = new User { UserName = adminUsername };
+
+            await userManager.CreateAsync(user, adminPassword);
+            await userManager.AddToRoleAsync(user, "Admin");
+        }
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

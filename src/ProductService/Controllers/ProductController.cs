@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using ProductService.Application.Handlers;
 using ProductService.Application.Commands;
 using Microsoft.AspNetCore.Authorization;
-using ProductService.Application.Events;
 using ProductService.Application.Queries;
 
 namespace ProductService.Controllers;
@@ -46,6 +45,7 @@ public class ProductController : ControllerBase
         return Ok(product);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateProductCommand command)
     {
@@ -54,7 +54,7 @@ public class ProductController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
     }
     
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCommand command)
     {
