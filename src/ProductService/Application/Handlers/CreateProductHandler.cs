@@ -32,9 +32,9 @@ public class CreateProductHandler
 
         await _repository.AddAsync(product);
 
-        await _eventPublisher.PublishAsync($"Product created: {product.Name}");
-
         await _cache.RemoveAsync("products_all");
+
+        await _eventPublisher.PublishAsync($"Product created: {product.Name}");
         
         return product;
     }

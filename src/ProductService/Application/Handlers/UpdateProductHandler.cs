@@ -34,9 +34,9 @@ public class UpdateProductHandler
 
         await _repository.UpdateAsync(product);
 
-        await _eventPublisher.PublishAsync($"Product updated: {product.Name}");
-
         await _cache.RemoveAsync("products_all");
+
+        await _eventPublisher.PublishAsync($"Product updated: {product.Name}");
 
         return true;
     }
