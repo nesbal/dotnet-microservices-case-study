@@ -8,7 +8,6 @@ using AuthService.Data;
 using AuthService.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Controllers;
 
@@ -19,6 +18,7 @@ public class AuthController : ControllerBase
     private readonly AppDbContext _context;
     private readonly IConfiguration _config;
     private readonly UserManager<User> _userManager;
+
     public AuthController(
         IConfiguration config,
         AppDbContext context,
@@ -39,23 +39,29 @@ public class AuthController : ControllerBase
         return Convert.ToBase64String(randomBytes);
     }
 
-    private string GenerateJwtToken(string username)    {
+    private async Task<string> GenerateJwtToken(User user)
+    {
         var key = _config["JWT_KEY"]
                   ?? throw new Exception("JWT_KEY is missing");
+
         var audience = _config["JWT_AUDIENCE"]
                        ?? throw new Exception("JWT_AUDIENCE is missing");
+
         var issuer = _config["JWT_ISSUER"]
                      ?? throw new Exception("JWT_ISSUER is missing");
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, username),            
-            new Claim(ClaimTypes.Role, "admin"),
+            new Claim(ClaimTypes.Name, user.UserName!),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var token = new JwtSecurityToken(
             issuer: issuer,
@@ -67,7 +73,7 @@ public class AuthController : ControllerBase
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    
+
     private string HashToken(string token)
     {
         using var sha256 = SHA256.Create();
@@ -94,7 +100,7 @@ public class AuthController : ControllerBase
         if (!isValid)
             return Unauthorized();
 
-        var accessToken = GenerateJwtToken(user.UserName!);
+        var accessToken = await GenerateJwtToken(user);
         var refreshToken = GenerateRefreshToken();
 
         _context.RefreshTokens.Add(new RefreshToken
@@ -112,7 +118,7 @@ public class AuthController : ControllerBase
             refreshToken
         });
     }
-    
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] LoginRequest request)
     {
@@ -141,6 +147,8 @@ public class AuthController : ControllerBase
             return BadRequest(result.Errors);
         }
 
+        await _userManager.AddToRoleAsync(user, "User");
+
         return Ok();
     }
 
@@ -161,7 +169,12 @@ public class AuthController : ControllerBase
         if (tokenInDb.ExpiresAt < DateTime.UtcNow)
             return Unauthorized();
 
-        var newAccessToken = GenerateJwtToken(tokenInDb.Username);
+        var user = await _userManager.FindByNameAsync(tokenInDb.Username);
+
+        if (user == null)
+            return Unauthorized();
+
+        var newAccessToken = await GenerateJwtToken(user);
 
         _context.RefreshTokens.Remove(tokenInDb);
 
@@ -182,7 +195,7 @@ public class AuthController : ControllerBase
             refreshToken = newRefreshToken
         });
     }
-    
+
     [Authorize]
     [HttpGet("me")]
     public IActionResult Me()
