@@ -18,6 +18,9 @@ services:
       - "5264:80"
     environment:
       - ASPNETCORE_URLS=http://+:80
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
 
   productservice:
     build: ./src/ProductService

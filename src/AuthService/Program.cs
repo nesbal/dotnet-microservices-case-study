@@ -19,18 +19,28 @@ builder.Services.AddIdentity<User, IdentityRole>()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+var jwtKey = builder.Configuration["JWT_KEY"] 
+             ?? throw new Exception("JWT_KEY is missing");
+
+var issuer = builder.Configuration["JWT_ISSUER"] 
+             ?? throw new Exception("JWT_ISSUER is missing");
+
+var audience = builder.Configuration["JWT_AUDIENCE"] 
+               ?? throw new Exception("JWT_AUDIENCE is missing");
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        var jwtKey = builder.Configuration["Jwt:Key"]
-                     ?? throw new Exception("Jwt:Key is missing in configuration");
-
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            ValidateIssuer = true,
+            ValidIssuer = issuer,
+
+            ValidateAudience = true,
+            ValidAudience = audience,
+
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtKey))
         };

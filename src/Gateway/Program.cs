@@ -19,20 +19,28 @@ builder.Services.AddRateLimiter(options =>
         opt.Window = TimeSpan.FromSeconds(10);
     });
 });
-var jwtKey = builder.Configuration["Jwt:Key"]
-             ?? throw new Exception("Jwt:Key missing");
-var issuer = builder.Configuration["Jwt:Issuer"];
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+
+var jwtKey = builder.Configuration["JWT_KEY"] 
+             ?? throw new Exception("JWT_KEY is missing");
+
+var issuer = builder.Configuration["JWT_ISSUER"] 
+             ?? throw new Exception("JWT_ISSUER is missing");
+
+var audience = builder.Configuration["JWT_AUDIENCE"] 
+               ?? throw new Exception("JWT_AUDIENCE is missing");
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidateAudience = false,
+            ValidIssuer = issuer,
+
+            ValidateAudience = true,
+            ValidAudience = audience,
+
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
-            ValidIssuer = issuer,
 
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtKey))
