@@ -2,8 +2,12 @@ name: .NET Microservices CI
 
 on:
   push:
-    branches: [ "*" ]
+    branches:
+      - "**"
   pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -19,10 +23,10 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore NsbCaseStudy.sln
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build NsbCaseStudy.sln --no-restore
 
       - name: Test
-        run: dotnet test --no-build || echo "No tests"
+        run: dotnet test NsbCaseStudy.sln --no-build || echo "No tests found"
