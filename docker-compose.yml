@@ -21,13 +21,23 @@ services:
       - JWT_KEY=${JWT_KEY}
       - JWT_ISSUER=${JWT_ISSUER}
       - JWT_AUDIENCE=${JWT_AUDIENCE}
+    volumes:
+      - auth_data:/app/data
 
   productservice:
     build: ./src/ProductService
     ports:
       - "5265:80"
+    depends_on:
+      - redis
+      - logservice
     environment:
       - ASPNETCORE_URLS=http://+:80
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+    volumes:
+      - product_data:/app/data
 
   logservice:
     build: ./src/LogService
@@ -35,8 +45,15 @@ services:
       - "5039:80"
     environment:
       - ASPNETCORE_URLS=http://+:80
+    volumes:
+      - log_data:/app/data
 
   redis:
     image: redis:7
     ports:
       - "6379:6379"
+
+volumes:
+  auth_data:
+  log_data:
+  product_data:
