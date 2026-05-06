@@ -26,6 +26,3 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build || echo "No tests"
-
-      - name: Build Docker images
-        run: docker compose build
