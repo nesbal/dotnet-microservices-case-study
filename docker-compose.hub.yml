@@ -1,6 +1,6 @@
 services:
   gateway:
-    build: ./src/Gateway
+    image: nesbal/dotnet-gateway:latest
     container_name: gateway
     ports:
       - "${GATEWAY_PORT:-8080}:80"
@@ -18,7 +18,7 @@ services:
       - LogService__BaseUrl=http://logservice
 
   authservice:
-    build: ./src/AuthService
+    image: nesbal/dotnet-authservice:latest
     container_name: authservice
     expose:
       - "80"
@@ -31,7 +31,7 @@ services:
       - ./data/auth:/app/data
 
   productservice:
-    build: ./src/ProductService
+    image: nesbal/dotnet-productservice:latest
     container_name: productservice
     expose:
       - "80"
@@ -46,7 +46,7 @@ services:
       - ./data/product:/app/data
 
   logservice:
-    build: ./src/LogService
+    image: nesbal/dotnet-logservice:latest
     container_name: logservice
     expose:
       - "80"
