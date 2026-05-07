@@ -1,9 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using AuthService.Data;
 using AuthService.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -20,69 +15,20 @@ public class AuthController : ControllerBase
     private readonly IConfiguration _config;
     private readonly UserManager<User> _userManager;
     private readonly ILogEventPublisher _logEventPublisher;
+    private readonly ITokenService _tokenService;
 
     public AuthController(
         IConfiguration config,
         AppDbContext context,
         UserManager<User> userManager,
-        ILogEventPublisher logEventPublisher)
+        ILogEventPublisher logEventPublisher,
+        ITokenService tokenService)
     {
         _config = config;
         _context = context;
         _userManager = userManager;
         _logEventPublisher = logEventPublisher;
-    }
-
-    private string GenerateRefreshToken()
-    {
-        var randomBytes = new byte[64];
-
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomBytes);
-
-        return Convert.ToBase64String(randomBytes);
-    }
-
-    private async Task<string> GenerateJwtToken(User user)
-    {
-        var key = _config["JWT_KEY"]
-                  ?? throw new Exception("JWT_KEY is missing");
-
-        var audience = _config["JWT_AUDIENCE"]
-                       ?? throw new Exception("JWT_AUDIENCE is missing");
-
-        var issuer = _config["JWT_ISSUER"]
-                     ?? throw new Exception("JWT_ISSUER is missing");
-
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-        var roles = await _userManager.GetRolesAsync(user);
-
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
-            claims: claims,
-            expires: DateTime.Now.AddHours(1),
-            signingCredentials: credentials
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    private string HashToken(string token)
-    {
-        using var sha256 = SHA256.Create();
-        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(token));
-        return Convert.ToBase64String(bytes);
+        _tokenService = tokenService;
     }
 
     [HttpPost("login")]
@@ -104,12 +50,12 @@ public class AuthController : ControllerBase
         if (!isValid)
             return Unauthorized();
 
-        var accessToken = await GenerateJwtToken(user);
-        var refreshToken = GenerateRefreshToken();
+        var accessToken = await _tokenService.GenerateJwtTokenAsync(user);
+        var refreshToken = _tokenService.GenerateRefreshToken();
 
         _context.RefreshTokens.Add(new RefreshToken
         {
-            Token = HashToken(refreshToken),
+            Token = _tokenService.HashToken(refreshToken),
             Username = user.UserName!,
             ExpiresAt = DateTime.UtcNow.AddDays(7)
         });
@@ -214,7 +160,7 @@ public class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(refreshToken))
             return BadRequest();
 
-        var hashed = HashToken(refreshToken);
+        var hashed = _tokenService.HashToken(refreshToken);
 
         var tokenInDb = _context.RefreshTokens
             .FirstOrDefault(x => x.Token == hashed);
@@ -230,15 +176,15 @@ public class AuthController : ControllerBase
         if (user == null)
             return Unauthorized();
 
-        var newAccessToken = await GenerateJwtToken(user);
+        var newAccessToken = await _tokenService.GenerateJwtTokenAsync(user);
 
         _context.RefreshTokens.Remove(tokenInDb);
 
-        var newRefreshToken = GenerateRefreshToken();
+        var newRefreshToken = _tokenService.GenerateRefreshToken();
 
         _context.RefreshTokens.Add(new RefreshToken
         {
-            Token = HashToken(newRefreshToken),
+            Token = _tokenService.HashToken(newRefreshToken),
             Username = tokenInDb.Username,
             ExpiresAt = DateTime.UtcNow.AddDays(7)
         });
@@ -270,7 +216,7 @@ public class AuthController : ControllerBase
             return BadRequest();
         }
 
-        var hashed = HashToken(refreshToken);
+        var hashed = _tokenService.HashToken(refreshToken);;
 
         var tokenInDb = _context.RefreshTokens
             .FirstOrDefault(x => x.Token == hashed);

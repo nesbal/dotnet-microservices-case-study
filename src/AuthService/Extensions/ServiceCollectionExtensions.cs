@@ -30,6 +30,13 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+    
+    public static IServiceCollection AddTokenServices(this IServiceCollection services)
+    {
+        services.AddScoped<ITokenService, TokenService>();
+
+        return services;
+    }
 
     public static IServiceCollection AddJwtAuthentication(
         this IServiceCollection services,
