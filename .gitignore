@@ -1,21 +1,17 @@
-# Build
-bin/
-obj/
+# Build outputs
+**/bin/
+**/obj/
 
-# User-specific
+# User-specific files
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
 
-# Rider / IntelliJ
+# Rider / VSCode / VS
 .idea/
-
-# VS Code
 .vscode/
-
-# Mac
-.DS_Store
+.vs/
 
 # Logs
 *.log
@@ -23,14 +19,12 @@ obj/
 # Environment
 .env
 
-# SQLite / local db
-*.db
+# OS
+.DS_Store
+Thumbs.db
+
+# .NET publish
+**/publish/
 
 # Docker
 docker-compose.override.yml
-
-# NuGet
-*.nupkg
-
-# Test results
-TestResults/
