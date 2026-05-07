@@ -145,7 +145,6 @@ This keeps the external API surface smaller and closer to a production-style dep
 ## Documentation
 
 - [API Documentation](docs/api.md)
-- [Postman Collection](docs/postman_collection.json)
 
 ## Services
 
