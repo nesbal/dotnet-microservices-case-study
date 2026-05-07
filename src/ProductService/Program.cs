@@ -10,8 +10,6 @@ using ProductService.Infrastructure.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
@@ -67,10 +65,10 @@ builder.Services.AddAuthorization(options =>
             return product?.OwnerUsername == user.Identity?.Name;
         }));
 });
-var dbPath = Path.Combine(AppContext.BaseDirectory, "products.db");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
+    options.UseSqlite(connectionString));
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<CreateProductHandler>();

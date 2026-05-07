@@ -1,9 +1,7 @@
 namespace LogService.Models;
 
-public class Log
+public class LogRequest
 {
-    public int Id { get; set; }
-
     public string ServiceName { get; set; } = string.Empty;
 
     public string EventType { get; set; } = string.Empty;
@@ -15,6 +13,4 @@ public class Log
     public string? UserName { get; set; }
 
     public string? ResourceId { get; set; }
-
-    public DateTime CreatedAt { get; set; }
 }

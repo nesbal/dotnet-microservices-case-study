@@ -16,28 +16,69 @@ public class LogController : ControllerBase
         _context = context;
         _logger = logger;
     }
-    
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] string message)
-    {
-        _context.Logs.Add(new Log
-        {
-            Message = message,
-            CreatedAt = DateTime.UtcNow
-        });
 
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] LogRequest request)
+    {
+        var level = NormalizeLevel(request.Level);
+
+        var log = new Log
+        {
+            ServiceName = request.ServiceName,
+            EventType = request.EventType,
+            Level = level,
+            Message = request.Message,
+            UserName = request.UserName,
+            ResourceId = request.ResourceId,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.Logs.Add(log);
         await _context.SaveChangesAsync();
 
-        if (!string.IsNullOrEmpty(message) &&
-            message.Contains("error", StringComparison.OrdinalIgnoreCase))
-        {
-            _logger.LogError("Error event: {Message}", message);
-        }
-        else
-        {
-            _logger.LogInformation("Product event received: {Message}", message);
-        }
+        WriteStructuredLog(level, log);
 
         return Ok();
+    }
+
+    private static string NormalizeLevel(string level)
+    {
+        return level.ToUpperInvariant() switch
+        {
+            "WARNING" => "WARNING",
+            "ERROR" => "ERROR",
+            "CRITICAL" => "CRITICAL",
+            _ => "INFO"
+        };
+    }
+
+    private void WriteStructuredLog(string level, Log log)
+    {
+        switch (level)
+        {
+            case "WARNING":
+                _logger.LogWarning(
+                    "LogReceived {@LogData}",
+                    log);
+                break;
+
+            case "ERROR":
+                _logger.LogError(
+                    "LogReceived {@LogData}",
+                    log);
+                break;
+
+            case "CRITICAL":
+                _logger.LogCritical(
+                    "LogReceived {@LogData}",
+                    log);
+                break;
+
+            default:
+                _logger.LogInformation(
+                    "LogReceived {@LogData}",
+                    log);
+                break;
+        }
     }
 }
