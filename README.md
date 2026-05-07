@@ -10,6 +10,22 @@ cp .env.example .env
 
 Update the values in `.env` if needed, especially `JWT_KEY` and `ADMIN_PASSWORD`.
 
+* JWT_KEY must be longer than 32 characters because HS256 requires a key greater than 256 bits.
+
+* The admin password must follow the default ASP.NET Core Identity password rules:
+  - at least 6 characters
+  - at least 1 uppercase letter
+  - at least 1 lowercase letter
+  - at least 1 digit
+  - at least 1 non-alphanumeric character, for example `!`, `?`, `@`, `#`
+
+Example:
+
+```env
+ADMIN_PASSWORD=Admin123!
+JWT_KEY=THIS_IS_A_SUPER_LONG_SECRET_KEY_1234567890
+```
+
 ---
 
 ## Option 1: Run with local Docker Compose build
