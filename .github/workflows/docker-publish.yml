@@ -23,7 +23,7 @@ jobs:
       - name: Build and push AuthService image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./src/AuthService
           file: ./src/AuthService/Dockerfile
           push: true
           tags: |
@@ -33,7 +33,7 @@ jobs:
       - name: Build and push ProductService image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./src/ProductService
           file: ./src/ProductService/Dockerfile
           push: true
           tags: |
@@ -43,7 +43,7 @@ jobs:
       - name: Build and push LogService image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./src/LogService
           file: ./src/LogService/Dockerfile
           push: true
           tags: |
@@ -53,7 +53,7 @@ jobs:
       - name: Build and push Gateway image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./src/Gateway
           file: ./src/Gateway/Dockerfile
           push: true
           tags: |
