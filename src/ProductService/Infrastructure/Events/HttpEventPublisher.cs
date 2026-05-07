@@ -15,6 +15,6 @@ public class HttpEventPublisher : IEventPublisher
 
     public async Task PublishAsync(LogEvent logEvent)
     {
-        await _httpClient.PostAsJsonAsync("http://logservice/create", logEvent);
+        await _httpClient.PostAsJsonAsync("create", logEvent);
     }
 }

@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddProductDatabase(builder.Configuration);
 builder.Services.AddProductApplication();
-builder.Services.AddProductLogging();
+builder.Services.AddProductLogging(builder.Configuration);
 builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 

@@ -37,9 +37,17 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddProductLogging(this IServiceCollection services)
+    public static IServiceCollection AddProductLogging(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddHttpClient<IEventPublisher, HttpEventPublisher>();
+        var logServiceUrl = configuration["LOG_SERVICE_URL"]
+                            ?? throw new Exception("LOG_SERVICE_URL is missing");
+
+        services.AddHttpClient<IEventPublisher, HttpEventPublisher>(client =>
+        {
+            client.BaseAddress = new Uri(logServiceUrl);
+        });
 
         return services;
     }

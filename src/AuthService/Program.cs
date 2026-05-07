@@ -5,8 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthDatabase(builder.Configuration);
 builder.Services.AddIdentityServices();
 builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddLogPublisher();
-
+builder.Services.AddLogPublisher(builder.Configuration);
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
