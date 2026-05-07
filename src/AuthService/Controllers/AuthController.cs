@@ -262,6 +262,40 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] string refreshToken)
+    {
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return BadRequest();
+        }
+
+        var hashed = HashToken(refreshToken);
+
+        var tokenInDb = _context.RefreshTokens
+            .FirstOrDefault(x => x.Token == hashed);
+
+        if (tokenInDb == null)
+        {
+            return Ok();
+        }
+
+        _context.RefreshTokens.Remove(tokenInDb);
+        await _context.SaveChangesAsync();
+
+        await _logEventPublisher.PublishAsync(new LogEvent
+        {
+            ServiceName = "AuthService",
+            EventType = "UserLoggedOut",
+            Level = "INFO",
+            Message = $"User logged out: {tokenInDb.Username}",
+            UserName = tokenInDb.Username,
+            ResourceId = tokenInDb.Id.ToString()
+        });
+
+        return Ok();
+    }
+    
     [Authorize]
     [HttpGet("me")]
     public IActionResult Me()
