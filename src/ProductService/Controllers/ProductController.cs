@@ -27,7 +27,7 @@ public class ProductController : ControllerBase
         _getByIdHandler = getByIdHandler;
     }
 
-    [HttpGet]
+    [HttpGet("list")]
     public async Task<IActionResult> GetAll()
     {
         var products = await _getAllHandler.Handle();
@@ -46,7 +46,7 @@ public class ProductController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] CreateProductCommand command)
     {
         var username = User.Identity?.Name!;
@@ -55,7 +55,7 @@ public class ProductController : ControllerBase
     }
     
     [Authorize(Policy = "AdminOrOwner")]
-    [HttpPut("{id}")]
+    [HttpPut("update/{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCommand command)
     {
         command.Id = id;
