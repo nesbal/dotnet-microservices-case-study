@@ -1,14 +1,13 @@
-namespace ProductService.Infrastructure.Events;
+using System.Net.Http.Json;
+using AuthService.Models;
 
-using System.Text;
-using System.Text.Json;
-using ProductService.Application.Events;
+namespace AuthService.Services;
 
-public class HttpEventPublisher : IEventPublisher
+public class HttpLogEventPublisher : ILogEventPublisher
 {
     private readonly HttpClient _httpClient;
 
-    public HttpEventPublisher(HttpClient httpClient)
+    public HttpLogEventPublisher(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }

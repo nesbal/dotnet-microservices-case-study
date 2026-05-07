@@ -8,6 +8,7 @@ using AuthService.Data;
 using AuthService.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using AuthService.Services;
 
 namespace AuthService.Controllers;
 
@@ -18,15 +19,18 @@ public class AuthController : ControllerBase
     private readonly AppDbContext _context;
     private readonly IConfiguration _config;
     private readonly UserManager<User> _userManager;
+    private readonly ILogEventPublisher _logEventPublisher;
 
     public AuthController(
         IConfiguration config,
         AppDbContext context,
-        UserManager<User> userManager)
+        UserManager<User> userManager,
+        ILogEventPublisher logEventPublisher)
     {
         _config = config;
         _context = context;
         _userManager = userManager;
+        _logEventPublisher = logEventPublisher;
     }
 
     private string GenerateRefreshToken()
@@ -112,6 +116,16 @@ public class AuthController : ControllerBase
 
         await _context.SaveChangesAsync();
 
+        await _logEventPublisher.PublishAsync(new LogEvent
+        {
+            ServiceName = "AuthService",
+            EventType = "UserLoggedIn",
+            Level = "INFO",
+            Message = $"User logged in: {user.UserName}",
+            UserName = user.UserName,
+            ResourceId = user.Id
+        });
+
         return Ok(new
         {
             accessToken,
@@ -149,9 +163,19 @@ public class AuthController : ControllerBase
 
         await _userManager.AddToRoleAsync(user, "User");
 
+        await _logEventPublisher.PublishAsync(new LogEvent
+        {
+            ServiceName = "AuthService",
+            EventType = "UserRegistered",
+            Level = "INFO",
+            Message = $"User registered: {user.UserName}",
+            UserName = user.UserName,
+            ResourceId = user.Id
+        });
+
         return Ok();
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpPost("users/{username}/promote")]
     public async Task<IActionResult> PromoteToAdmin(string username)
@@ -170,6 +194,16 @@ public class AuthController : ControllerBase
 
         if (!result.Succeeded)
             return BadRequest(result.Errors);
+
+        await _logEventPublisher.PublishAsync(new LogEvent
+        {
+            ServiceName = "AuthService",
+            EventType = "UserPromotedToAdmin",
+            Level = "INFO",
+            Message = $"User promoted to admin: {user.UserName}",
+            UserName = User.Identity?.Name,
+            ResourceId = user.Id
+        });
 
         return Ok($"{username} is now an Admin");
     }
@@ -210,6 +244,16 @@ public class AuthController : ControllerBase
         });
 
         await _context.SaveChangesAsync();
+
+        await _logEventPublisher.PublishAsync(new LogEvent
+        {
+            ServiceName = "AuthService",
+            EventType = "TokenRefreshed",
+            Level = "INFO",
+            Message = $"Token refreshed for user: {user.UserName}",
+            UserName = user.UserName,
+            ResourceId = user.Id
+        });
 
         return Ok(new
         {

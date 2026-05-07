@@ -1,11 +1,12 @@
 using LogService.Data;
 using LogService.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LogService.Controllers;
 
 [ApiController]
-[Route("logs")]
+[Route("")]
 public class LogController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -16,8 +17,19 @@ public class LogController : ControllerBase
         _context = context;
         _logger = logger;
     }
+    
+    [HttpGet("list")]
+    public async Task<IActionResult> GetAll()
+    {
+        var logs = await _context.Logs
+            .OrderByDescending(log => log.CreatedAt)
+            .Take(100)
+            .ToListAsync();
 
-    [HttpPost]
+        return Ok(logs);
+    }
+
+    [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] LogRequest request)
     {
         var level = NormalizeLevel(request.Level);
