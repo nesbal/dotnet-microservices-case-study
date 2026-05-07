@@ -109,7 +109,7 @@ public class AuthController : ControllerBase
 
         _context.RefreshTokens.Add(new RefreshToken
         {
-            Token = refreshToken,
+            Token = HashToken(refreshToken),
             Username = user.UserName!,
             ExpiresAt = DateTime.UtcNow.AddDays(7)
         });
