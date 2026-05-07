@@ -1,0 +1,61 @@
+name: Docker Publish
+
+on:
+  push:
+    branches:
+      - main
+      - test/v1.0.0
+
+jobs:
+  docker-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push AuthService image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./src/AuthService/Dockerfile
+          push: true
+          tags: |
+            nesbal/dotnet-authservice:latest
+            nesbal/dotnet-authservice:${{ github.sha }}
+
+      - name: Build and push ProductService image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./src/ProductService/Dockerfile
+          push: true
+          tags: |
+            nesbal/dotnet-productservice:latest
+            nesbal/dotnet-productservice:${{ github.sha }}
+
+      - name: Build and push LogService image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./src/LogService/Dockerfile
+          push: true
+          tags: |
+            nesbal/dotnet-logservice:latest
+            nesbal/dotnet-logservice:${{ github.sha }}
+
+      - name: Build and push Gateway image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./src/Gateway/Dockerfile
+          push: true
+          tags: |
+            nesbal/dotnet-gateway:latest
+            nesbal/dotnet-gateway:${{ github.sha }}
