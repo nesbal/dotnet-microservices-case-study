@@ -58,13 +58,14 @@ public class ProductController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCommand command)
     {
-        if (id != command.Id)
-            return BadRequest();
+        command.Id = id;
 
         var success = await _updateHandler.Handle(command);
 
         if (!success)
+        {
             return NotFound();
+        }
 
         return NoContent();
     }
