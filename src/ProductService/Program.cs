@@ -1,5 +1,5 @@
 using ProductService.Extensions;
-
+using ProductService.Authorization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddProductDatabase(builder.Configuration);
@@ -11,28 +11,9 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOrOwner", policy =>
-        policy.RequireAssertion(context =>
-        {
-            var user = context.User;
-
-            if (user.IsInRole("Admin"))
-            {
-                return true;
-            }
-
-            var httpContext = context.Resource as HttpContext;
-            var routeId = httpContext?.Request.RouteValues["id"]?.ToString();
-
-            if (routeId == null)
-            {
-                return false;
-            }
-
-            var db = httpContext.RequestServices.GetRequiredService<ProductService.Data.AppDbContext>();
-            var product = db.Products.Find(int.Parse(routeId));
-
-            return product?.OwnerUsername == user.Identity?.Name;
-        }));
+    {
+        policy.Requirements.Add(new AdminOrOwnerRequirement());
+    });
 });
 
 builder.Services.AddEndpointsApiExplorer();

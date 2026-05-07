@@ -8,6 +8,8 @@ using ProductService.Application.Interfaces;
 using ProductService.Data;
 using ProductService.Infrastructure.Events;
 using ProductService.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authorization;
+using ProductService.Authorization;
 
 namespace ProductService.Extensions;
 
@@ -33,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UpdateProductHandler>();
         services.AddScoped<GetAllProductsHandler>();
         services.AddScoped<GetProductByIdHandler>();
+        services.AddScoped<IAuthorizationHandler, AdminOrOwnerHandler>();
 
         return services;
     }
