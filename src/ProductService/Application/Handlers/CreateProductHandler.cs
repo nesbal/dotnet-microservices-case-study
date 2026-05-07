@@ -35,7 +35,15 @@ public class CreateProductHandler
 
         await _cache.RemoveAsync("products_all");
 
-        await _eventPublisher.PublishAsync($"Product created: {product.Name}");
+        await _eventPublisher.PublishAsync(new LogEvent
+        {
+            ServiceName = "ProductService",
+            EventType = "ProductCreated",
+            Level = "INFO",
+            Message = $"Product created: {product.Name}",
+            UserName = product.OwnerUsername,
+            ResourceId = product.Id.ToString()
+        });
         
         return product;
     }

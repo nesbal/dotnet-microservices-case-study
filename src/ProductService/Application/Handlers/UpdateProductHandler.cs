@@ -36,7 +36,15 @@ public class UpdateProductHandler
 
         await _cache.RemoveAsync("products_all");
 
-        await _eventPublisher.PublishAsync($"Product updated: {product.Name}");
+        await _eventPublisher.PublishAsync(new LogEvent
+        {
+            ServiceName = "ProductService",
+            EventType = "ProductUpdated",
+            Level = "INFO",
+            Message = $"Product updated: {product.Name}",
+            UserName = product.OwnerUsername,
+            ResourceId = product.Id.ToString()
+        });
 
         return true;
     }

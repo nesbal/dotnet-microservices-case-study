@@ -13,13 +13,8 @@ public class HttpEventPublisher : IEventPublisher
         _httpClient = httpClient;
     }
 
-    public async Task PublishAsync(string message)
+    public async Task PublishAsync(LogEvent logEvent)
     {
-        var content = JsonSerializer.Serialize(message);
-
-        await _httpClient.PostAsync(
-            "http://logservice/logs",
-            new StringContent(content, Encoding.UTF8, "application/json")
-        );
+        await _httpClient.PostAsJsonAsync("http://logservice/logs", logEvent);
     }
 }
