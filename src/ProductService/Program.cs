@@ -1,48 +1,13 @@
-using System.Text;
-using ProductService.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using ProductService.Application.Handlers;
-using ProductService.Application.Interfaces;
-using ProductService.Infrastructure.Repositories;
-using ProductService.Application.Events;
-using ProductService.Infrastructure.Events;
+using ProductService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
-builder.Services.AddHttpClient();
-var jwtKey = builder.Configuration["JWT_KEY"];
-var issuer = builder.Configuration["JWT_ISSUER"];
-var audience = builder.Configuration["JWT_AUDIENCE"];
-builder.Services
-    .AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = "Bearer";
-        options.DefaultChallengeScheme = "Bearer";
-    })
-    .AddJwtBearer("Bearer", options =>
-    {
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtKey));
+builder.Services.AddProductDatabase(builder.Configuration);
+builder.Services.AddProductApplication();
+builder.Services.AddProductLogging();
+builder.Services.AddRedisCache(builder.Configuration);
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = issuer,
-
-            ValidateAudience = true,
-            ValidAudience = audience,
-
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero,
-
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = key
-        };
-    });
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOrOwner", policy =>
@@ -51,42 +16,32 @@ builder.Services.AddAuthorization(options =>
             var user = context.User;
 
             if (user.IsInRole("Admin"))
+            {
                 return true;
+            }
 
             var httpContext = context.Resource as HttpContext;
             var routeId = httpContext?.Request.RouteValues["id"]?.ToString();
 
             if (routeId == null)
+            {
                 return false;
+            }
 
-            var db = httpContext.RequestServices.GetRequiredService<AppDbContext>();
+            var db = httpContext.RequestServices.GetRequiredService<ProductService.Data.AppDbContext>();
             var product = db.Products.Find(int.Parse(routeId));
 
             return product?.OwnerUsername == user.Identity?.Name;
         }));
 });
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(connectionString));
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<CreateProductHandler>();
-builder.Services.AddScoped<UpdateProductHandler>();
-builder.Services.AddScoped<IEventPublisher, HttpEventPublisher>();
-builder.Services.AddScoped<GetAllProductsHandler>();
-builder.Services.AddScoped<GetProductByIdHandler>();
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration["Redis:ConnectionString"];
-});
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
+app.ApplyMigrations();
 
 if (app.Environment.IsDevelopment())
 {
@@ -95,8 +50,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
-app.Run();
 
+app.MapControllers();
+
+app.Run();
